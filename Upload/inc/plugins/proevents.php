@@ -1,12 +1,12 @@
 <?php
 /**
- * Pro Events 1.0
+ * Pro Events 1.1
  * Advanced calendar events.
  *  
  * Language pack.
  * 
  * By Jared Williams
- * Copyright 2012
+ * Copyright 2013
  * 
  * Website: http://www.jaredwilliams.com.au
  *  
@@ -30,7 +30,7 @@ function proevents_info() {
 		"description"		=> "Advanced calendar events.",
 		"author"			=> "Jared Williams",
 		"authorsite"		=> "http://www.jaredwilliams.com.au",
-		"version"			=> "1.0",
+		"version"			=> "1.1",
 		"compatibility"		=> "6"
 	);
 } //END proevents_info()
@@ -226,6 +226,7 @@ function proevents_insert_templates($Doadd=array(), $Donotadd=array()) {
 	</head>
 	<body>
 		{$header}
+		{$notice}
 
 		<table width="100%" class="tborder">
 			<tr>
@@ -312,35 +313,78 @@ function proevents_insert_templates($Doadd=array(), $Donotadd=array()) {
 		
 		<table width="100%" class="tborder">
 			<tr>
-				<td class="thead" colspan="2">{$lang->title_event_create}</td>
+				<td class="thead" colspan="3">{$lang->title_event_create}</td>
 			</tr>
 			{$form_errors}
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_name}</strong></td>
-				<td width="80%" class="trow1"><input type="text" class="textbox" name="name" size="40" maxlength="2048" value="{$event[\'name\']}" /></td>
+				<td width="80%" colspan="2" class="trow1"><input type="text" class="textbox" name="name" size="40" maxlength="2048" value="{$event[\'name\']}" /></td>
 			</tr>
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_description}</strong></td>
-				<td width="80%" class="trow1"><textarea name="description" rows="5" cols="36" class="textbox">{$event[\'description\']}</textarea></td>
+				<td width="80%" colspan="2" class="trow1"><textarea name="description" rows="5" cols="36" class="textbox">{$event[\'description\']}</textarea></td>
 			</tr>
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_location}</strong></td>
-				<td width="80%" class="trow1"><input type="text" class="textbox" name="location" size="40" maxlength="256" value="{$event[\'location\']}" /></td>
+				<td width="80%" colspan="2" class="trow1"><input type="text" class="textbox" name="location" size="40" maxlength="256" value="{$event[\'location\']}" /></td>
 			</tr>
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_imageurl}</strong></td>
-				<td width="80%" class="trow1"><input type="text" class="textbox" name="imageurl" size="40" maxlength="256" value="{$event[\'imageurl\']}" /></td>
+				<td width="80%" colspan="2" class="trow1"><input type="text" class="textbox" name="imageurl" size="40" maxlength="256" value="{$event[\'imageurl\']}" /></td>
 			</tr>
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_dates}</strong></td>
-				<td width="80%" class="trow1">
-					<input type="text" class="textbox" name="datestart" size="20" maxlength="256" value="{$datestart}" placeholder="eg. 10:30am 24 January" /> until <input type="text" class="textbox" name="dateend" size="20" maxlength="256" value="{$dateend}" /><br />
+				<td width="40%" class="trow1">
+					<select name="datestart[hour]">
+						{$event[\'datestart\'][\'hours\']}
+					</select>
+
+					<select name="datestart[minute]">
+						{$event[\'datestart\'][\'minutes\']}
+					</select>
+
+					On
+
+					<select name="datestart[day]">
+						{$event[\'datestart\'][\'days\']}
+					</select>
+
+					<select name="datestart[month]">
+						{$event[\'datestart\'][\'months\']}
+					</select>
+
+					<select name="datestart[year]">
+						{$event[\'datestart\'][\'years\']}
+					</select>
+				</td>
+				<td width="40%" class="trow1">
+					<select name="dateend[hour]">
+						{$event[\'dateend\'][\'hours\']}
+					</select>
+
+					<select name="dateend[minute]">
+						{$event[\'dateend\'][\'minutes\']}
+					</select>
+
+					On
+
+					<select name="dateend[day]">
+						{$event[\'dateend\'][\'days\']}
+					</select>
+
+					<select name="dateend[month]">
+						{$event[\'dateend\'][\'months\']}
+					</select>
+
+					<select name="dateend[year]">
+						{$event[\'dateend\'][\'years\']}
+					</select>
 				</td>
 			</tr>
 			
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_rsvp}</strong></td>
-				<td width="80%" class="trow1">
+				<td width="80%" colspan="2" class="trow1">
 					<input type="checkbox" class="checkbox" name="allowrsvp" {$allowrsvp} /> {$lang->label_event_edit_allowrsvp}<br />
 					<input type="checkbox" class="checkbox" name="allowcomments" {$allowcomments} /> {$lang->label_event_edit_allowcomments}<br />
 					<input type="text" class="textbox" name="rsvplimit" size="5" maxlength="256" value="0" /> {$lang->label_event_edit_rsvplimit}<br />
@@ -350,9 +394,8 @@ function proevents_insert_templates($Doadd=array(), $Donotadd=array()) {
 			
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_thread}</strong></td>
-				<td width="80%" class="trow1">
-					<input type="checkbox" class="checkbox" name="postthread" {$postthread} /> {$lang->label_event_edit_postthread}<br />
-					{$lang->label_event_edit_forum} <select class="textbox" name="forumid">{$forumoptions}</select>
+				<td width="80%" colspan="2" class="trow1">
+					{$threadsettings}
 				</td>
 			</tr>
 		</table>
@@ -382,39 +425,89 @@ function proevents_insert_templates($Doadd=array(), $Donotadd=array()) {
 		
 		<table width="100%" class="tborder">
 			<tr>
-				<td class="thead" colspan="2">{$lang->title_event_edit}</td>
+				<td class="thead" colspan="3">{$lang->title_event_edit}</td>
 			</tr>
 			{$form_errors}
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_name}</strong></td>
-				<td width="80%" class="trow1"><input type="text" class="textbox" name="name" size="40" maxlength="2048" value="{$event[\'name\']}" /></td>
+				<td width="80%" colspan="2" class="trow1"><input type="text" class="textbox" name="name" size="40" maxlength="2048" value="{$event[\'name\']}" /></td>
 			</tr>
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_description}</strong></td>
-				<td width="80%" class="trow1"><textarea name="description" rows="5" cols="36" class="textbox">{$event[\'description\']}</textarea></td>
+				<td width="80%" colspan="2" class="trow1"><textarea name="description" rows="5" cols="36" class="textbox">{$event[\'description\']}</textarea></td>
 			</tr>
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_location}</strong></td>
-				<td width="80%" class="trow1"><input type="text" class="textbox" name="location" size="40" maxlength="256" value="{$event[\'location\']}" /></td>
+				<td width="80%" colspan="2" class="trow1"><input type="text" class="textbox" name="location" size="40" maxlength="256" value="{$event[\'location\']}" /></td>
 			</tr>
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_imageurl}</strong></td>
-				<td width="80%" class="trow1"><input type="text" class="textbox" name="imageurl" size="40" maxlength="256" value="{$event[\'imageurl\']}" /></td>
+				<td width="80%" colspan="2" class="trow1"><input type="text" class="textbox" name="imageurl" size="40" maxlength="256" value="{$event[\'imageurl\']}" /></td>
 			</tr>
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_dates}</strong></td>
-				<td width="80%" class="trow1">
-					<input type="text" class="textbox" name="datestart" size="20" maxlength="256" value="{$datestart}" placeholder="eg. 10:30am 24 January" /> until <input type="text" class="textbox" name="dateend" size="20" maxlength="256" value="{$dateend}" /><br />
+				<td width="40%" class="trow1">
+					<select name="datestart[hour]">
+						{$event[\'datestart\'][\'hours\']}
+					</select>
+
+					<select name="datestart[minute]">
+						{$event[\'datestart\'][\'minutes\']}
+					</select>
+
+					On
+
+					<select name="datestart[day]">
+						{$event[\'datestart\'][\'days\']}
+					</select>
+
+					<select name="datestart[month]">
+						{$event[\'datestart\'][\'months\']}
+					</select>
+
+					<select name="datestart[year]">
+						{$event[\'datestart\'][\'years\']}
+					</select>
+				</td>
+				<td width="40%" class="trow1">
+					<select name="dateend[hour]">
+						{$event[\'dateend\'][\'hours\']}
+					</select>
+
+					<select name="dateend[minute]">
+						{$event[\'dateend\'][\'minutes\']}
+					</select>
+
+					On
+
+					<select name="dateend[day]">
+						{$event[\'dateend\'][\'days\']}
+					</select>
+
+					<select name="dateend[month]">
+						{$event[\'dateend\'][\'months\']}
+					</select>
+
+					<select name="dateend[year]">
+						{$event[\'dateend\'][\'years\']}
+					</select>
 				</td>
 			</tr>
 			
 			<tr>
 				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_rsvp}</strong></td>
-				<td width="80%" class="trow1">
+				<td width="80%" colspan="2" class="trow1">
 					<input type="checkbox" class="checkbox" name="allowrsvp" {$allowrsvp} /> {$lang->label_event_edit_allowrsvp}<br />
 					<input type="checkbox" class="checkbox" name="allowcomments" {$allowcomments} /> {$lang->label_event_edit_allowcomments}<br />
 					<input type="text" class="textbox" name="rsvplimit" size="5" maxlength="256" value="{$event[\'rsvplimit\']}" /> {$lang->label_event_edit_rsvplimit}<br />
 					<input type="checkbox" class="checkbox" name="approversvp" {$approversvp} /> {$lang->label_event_edit_approversvp}
+				</td>
+			</tr>
+
+			<tr>
+				<td width="20%" class="trow1"><strong>{$lang->label_event_edit_thread}</strong></td>
+				<td width="80%" colspan="2" class="trow1">
+					{$threadsettings}
 				</td>
 			</tr>
 		</table>
@@ -430,6 +523,13 @@ function proevents_insert_templates($Doadd=array(), $Donotadd=array()) {
 		{$footer}
 	</body>
 </html>',
+
+		'proevents_event_thread_settings'	=> '
+<input type="checkbox" class="checkbox" name="postthread" {$postthread} /> {$lang->label_event_edit_postthread}<br />
+{$lang->label_event_edit_forum} <select class="textbox" name="forumid">{$forumoptions}</select>',
+
+		'proevents_event_mod_thread_settings'	=> '
+{$lang->label_event_edit_threadid} <input type="text" class="textbox" name="threadid" size="40" maxlength="256" value="{$event[\'threadid\']}" />',
 
 		'proevents_event_cancel'		=> '
 <html>
@@ -604,7 +704,7 @@ function proevents_insert_templates($Doadd=array(), $Donotadd=array()) {
 		'proevents_calendar_view_event_row_none'		=> '
 <tr>
 	<td width="100%" class="trow1" style="text-align: center">
-		No events to display
+		{$lang->msg_no_events}
 	</td>
 </tr>',
 
@@ -625,6 +725,10 @@ function proevents_insert_templates($Doadd=array(), $Donotadd=array()) {
 <td width="25%" class="trow1">
 	<a href="events.php?action=create"><button type="button">{$lang->user_controls_create}</button></a>
 </td>',
+		'proevents_calendar_user_controls_old' => '
+<td width="25%" class="trow1">
+	<a href="events.php?action=old"><button type="button">{$lang->user_controls_old}</button></a>
+</td>',
 
 		//TEMPLATES: Thread
 		'proevents_thread_view'					=> '
@@ -637,9 +741,41 @@ function proevents_insert_templates($Doadd=array(), $Donotadd=array()) {
 				<h2><a href="{$mybb->settings[\'bburl\']}/events.php?action=view&eventid={$eventid}">{$name}</a></h2>
 				<h3>{$location}</h3>
 				<h3>{$when}</h3>
+				{$attendees}
 		</td>
 	</tr>
 </table>',
+
+		//TEMPLATES: Notice
+		'proevents_event_notice_ended'			=> '
+<table width="100%" class="tborder">
+	<tr>
+		<td class="trow1">
+				{$lang->notice_ended}
+		</td>
+	</tr>
+</table>
+<br />',
+
+		'proevents_event_notice_soon'			=> '
+<table width="100%" class="tborder">
+	<tr>
+		<td class="trow1">
+				{$lang->notice_soon}
+		</td>
+	</tr>
+</table>
+<br />',
+
+		'proevents_event_notice_running'			=> '
+<table width="100%" class="tborder">
+	<tr>
+		<td class="trow1">
+				{$lang->notice_running}
+		</td>
+	</tr>
+</table>
+<br />',
 	);
 
 	//Insert templates...
@@ -767,6 +903,15 @@ function proevents_insert_settings($Doadd=array(), $Donotadd=array()) {
 		'description' => 'Comma delimited list of forums event creators can automatically post to (leave blank to allow all).',
 		'optionscode' => 'text',
 		'value' => '',
+		'disporder' => 1,
+		'gid' => $group['gid']
+	);
+	$insertarray[] = array(
+		'name' => 'proevents_soon_cutoff',
+		'title' => 'Coming Soon Cut-off',
+		'description' => 'Cut-off (in days) for when events are coming soon (leave blank or set to 0 to ignore).',
+		'optionscode' => 'text',
+		'value' => '7',
 		'disporder' => 1,
 		'gid' => $group['gid']
 	);
@@ -954,6 +1099,22 @@ function proevents_get_event_rsvp($eventid, $unapproved=false, $currentuser=fals
 } //END proevents_event_rsvp()
 
 
+function proevents_compile_date($Input) {
+	//TODO: Verify input!
+
+	//Compile...
+	$date = $Input['year'].'-'.$Input['month'].'-'.$Input['day'].' '.$Input['hour'].':'.$Input['minute'].':00';
+	
+	//Convert to a friendly timestamp...
+	$date = strtotime($date);
+
+	//Adjust for timezone...
+	$date = $date - ($offset * 3600);
+
+	return $date;
+}
+
+
 //FUNCTION: Validate new event data.
 function proevents_validate_event_input() {
 	global $mybb, $db;
@@ -993,45 +1154,66 @@ function proevents_validate_event_input() {
 		$input['imageurl'] = '';
 	}
 	
-	//Dates...
-	if ($mybb->input['datestart']) {
-		//First get timestamp for what the user actually specified...
-		$datestart = strtotime($mybb->input['datestart'], $time);
+	// //Dates...
+	// if ($mybb->input['datestart']) {
+	// 	//First get timestamp for what the user actually specified...
+	// 	$datestart = strtotime($mybb->input['datestart'], $time);
 		
-		//Adjust back to UNIX timestamp...
-		$datestart = $datestart - ($offset * 3600);
+	// 	//Adjust back to UNIX timestamp...
+	// 	$datestart = $datestart - ($offset * 3600);
 
-		if ($datestart) {
-			$input['datestart'] = $datestart;
-		} else {
-			$errors[] = 'Invalid event starting date';
-		}
-	} else {
-		$errors[] = 'No event starting date specified';
-	}
-	if ($mybb->input['dateend']) {
-		//First get timestamp for what the user actually specified...
-		$dateend = strtotime($mybb->input['dateend'], $time);
+	// 	if ($datestart) {
+	// 		$input['datestart'] = $datestart;
+	// 	} else {
+	// 		$errors[] = 'Invalid event starting date';
+	// 	}
+	// } else {
+	// 	$errors[] = 'No event starting date specified';
+	// }
+	// if ($mybb->input['dateend']) {
+	// 	//First get timestamp for what the user actually specified...
+	// 	$dateend = strtotime($mybb->input['dateend'], $time);
 		
-		//Adjust back to UNIX timestamp...
-		$dateend = $dateend - ($offset * 3600);
+	// 	//Adjust back to UNIX timestamp...
+	// 	$dateend = $dateend - ($offset * 3600);
 		
-		if ($dateend) {
-			if ($dateend > $datestart) {
-				$input['dateend'] = $dateend;
-			} else {
-				$errors[] = 'Ending date cannot be before the starting date';
-			}
+	// 	if ($dateend) {
+	// 		if ($dateend > $datestart) {
+	// 			$input['dateend'] = $dateend;
+	// 		} else {
+	// 			$errors[] = 'Ending date cannot be before the starting date';
+	// 		}
 			
-		} else {
-			$errors[] = 'Invalid event ending date';
-		}
+	// 	} else {
+	// 		$errors[] = 'Invalid event ending date';
+	// 	}
 		
 		
+	// } else {
+	// 	$dateend = 0;
+	// }
+
+
+	$date = proevents_compile_date($mybb->input['datestart']);
+
+	if ($date) {
+		$input['datestart'] = $date;
 	} else {
-		$dateend = 0;
+		$errors[] = 'Invalid event starting date';
 	}
-	
+
+	$date = proevents_compile_date($mybb->input['dateend']);
+
+	if ($date) {
+		$input['dateend'] = $date;
+	} else {
+		$errors[] = 'Invalid event ending date';
+	}
+
+	if ($input['dateend'] < $input['datestart']) {
+		$errors[] = 'Ending date cannot be before the starting date';
+	}
+
 	//Checkbox...
 	if ($mybb->input['allowrsvp']) {
 		$input['allowrsvp'] = 1;
@@ -1074,6 +1256,12 @@ function proevents_validate_event_input() {
 		}
 	} else {
 		$input['forumid'] = 0;
+	}
+
+	if ($mybb->input['threadid']) {
+		$input['threadid'] = intval($mybb->input['threadid']);
+	} else {
+		$input['threadid'] = '';
 	}
 
 	//If we have any errors, return them, otherwise return valid product...
@@ -1156,17 +1344,19 @@ function proevents_generate_dropdown($Name, $Selected=null) {
 		// break;
 		
 		case 'forum':
-			$query = $db->simple_select("forums", "*", "`pid` > 0 AND `fid` IN (".$db->escape_string($mybb->settings['proevents_event_thread_forums']).")");
+			if ($mybb->settings['proevents_event_thread_forums']) {
+				$query = $db->simple_select("forums", "*", "`pid` > 0 AND `fid` IN (".$db->escape_string($mybb->settings['proevents_event_thread_forums']).")");
 
-			if ($db->num_rows($query) > 0) {
-				while ($forum = $db->fetch_array($query)) {
-					if ($forum['fid'] == $Selected || $forum['name'] == $Selected) {
-						$selectit = ' selected';
-					} else {
-						$selectit = '';
+				if ($db->num_rows($query) > 0) {
+					while ($forum = $db->fetch_array($query)) {
+						if ($forum['fid'] == $Selected || $forum['name'] == $Selected) {
+							$selectit = ' selected';
+						} else {
+							$selectit = '';
+						}
+					
+						$options .= '	<option value="'.$forum['fid'].'"'.$selectit.'>'.$forum['name'].'</option>';
 					}
-				
-					$options .= '	<option value="'.$forum['fid'].'"'.$selectit.'>'.$forum['name'].'</option>';
 				}
 			}
 		break;
@@ -1185,11 +1375,12 @@ function proevents_showthread() {
 	
 	//Try and find thread...
 	$query = $db->query("SELECT * FROM `".TABLE_PREFIX."proevents` 
-		WHERE `threadid` = '".$db->escape_string($tid)."'
+		WHERE `threadid` > 0 AND `threadid` = '".$db->escape_string($tid)."'
+		LIMIT 0,1
 	");
 	$event = $db->fetch_array($query);
-	
-	if (count($event)) {
+
+	if ($event['eventid']) {
 		$name			= $event['name'];
 		$location		= $event['location'];
 		$eventid		= $event['eventid'];
@@ -1201,7 +1392,7 @@ function proevents_showthread() {
 		$dateend 		= my_date($mybb->settings['dateformat'], $event['dateend'], $mybb->user['timezone']);
 		$timeend		= my_date($mybb->settings['timeformat'], $event['dateend'], $mybb->user['timezone']);
 
-
+		$attendees		= '';
 		$when			= $datestart;
 
 		//Time...
@@ -1216,6 +1407,11 @@ function proevents_showthread() {
 			if ($timeend && $timeend != '12:00am') {
 				$when .= ' @ '.$timeend;
 			}
+		}
+
+		//Attendee count...
+		if ($event['rsvpcount'] > 0) {
+			$attendees = $event['rsvpcount'].' attendees';
 		}
 	
 		eval("\$proevent = \"".$templates->get('proevents_thread_view')."\";");
@@ -1329,5 +1525,112 @@ function proevents_get_user_timezoneoffset() {
 	}
 	
 	return $offset;
+}
+
+
+function proevents_parse_date($Timestamp=0) {
+	//TODO: Verify timestamp!
+
+	$Timestamp = intval($Timestamp);
+
+	if (!$Timestamp) {
+		$Timestamp = time();
+	}
+
+	return array(
+		'second'	=> date("s", $Timestamp),
+		'minute'	=> date("i", $Timestamp),
+		'hour'  	=> date("H", $Timestamp),
+
+		'day'		=> date("d", $Timestamp),
+		'month'		=> date("m", $Timestamp),
+		'year'		=> date("Y", $Timestamp),
+	);
+}
+
+
+function proevents_build_minutes($Date=array()) {
+	$now = $Date['minute'];
+
+	$html = '';
+
+	for ($i=0; $i<=59; $i++) {     
+		$html .= '<option value="'.$i.'" '.($i == $now ? 'selected' : '').'>'.($i < 10 ? '0' : '').$i.'</option>';
+	}
+
+	return $html;
+}
+
+function proevents_build_hours($Date=array()) {
+	$now = $Date['hour'];
+
+	$html = '';
+
+	for ($i=0; $i<=24; $i++) {
+		$html .= '<option value="'.$i.'" '.($i == $now ? 'selected' : '').'>'.$i.'</option>';
+	}
+
+	return $html;
+}
+
+function proevents_build_days($Date=array()) {
+	$now = $Date['day'];
+
+	$html = '';
+
+	for ($i=1; $i<=31; $i++) {
+		$html .= '<option value="'.$i.'" '.($i == $now ? 'selected' : '').'>'.$i.'</option>';
+	}
+
+	return $html;
+}
+
+function proevents_build_months($Date=array()) {
+	$now = $Date['month'];
+
+	$months = array(
+		'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+	);
+
+	$html = '';
+
+	foreach ($months as $i => $label) {
+		$i = $i + 1;
+
+		$html .= '<option value="'.$i.'" '.($i == $now ? 'selected' : '').'>'.$label.'</option>';
+	}
+
+	return $html;
+}
+
+function proevents_build_years($Date=array()) {
+	$now = $Date['year'];
+
+	$html = '';
+
+	$thisyear	= date('Y', $now);
+	#$limit		= $thisyear + 100;
+	$limit		= 2037; //Maximum timestamp
+
+	for ($i=$thisyear; $i<=$limit; $i++) {
+		$html .= '<option value="'.$i.'" '.($i == $now ? 'selected' : '').'>'.$i.'</option>';
+	}
+
+	return $html;
+}
+
+
+function proevents_build_dates($Date=array()) {
+	if (!count($Date)) {
+		$Date = proevents_parse_date();
+	}
+
+	return array(
+		'minutes'	=> proevents_build_minutes($Date),
+		'hours' 	=> proevents_build_hours($Date),
+		'days' 		=> proevents_build_days($Date),
+		'months' 	=> proevents_build_months($Date),
+		'years' 	=> proevents_build_years($Date)
+	);
 }
 ?>

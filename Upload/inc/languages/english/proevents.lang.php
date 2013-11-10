@@ -43,6 +43,7 @@ $l['label_event_edit_timezone']								= "Timezone";
 
 //Forms - Thread
 $l['label_event_edit_thread']								= "Thread Settings";
+$l['label_event_edit_threadid']								= "Thread ID";
 $l['label_event_edit_postthread']							= "Post thread to forums";
 $l['label_event_edit_forum']								= "To forum";
 
@@ -70,13 +71,15 @@ $l['button_unrsvp']											= "Remove RSVP";
 $l['button_viewthread']										= "Visit Thread";
 
 //Messages
+$l['msg_none']												= "None";
+$l['msg_no_events']											= "No events to display";
+
 $l['msg_event_create_success']								= "Event created successfully.";
 $l['msg_event_edit_success']								= "Event edited successfully.";
 $l['msg_event_cancel_confirm']								= "Are you sure you want to cancel this event?";
 $l['msg_event_cancel_success']								= "Event cancelled successfully.";
 
 $l['msg_rsvp_success']										= "You have successfully RSVP'ed to this event.";
-
 $l['msg_unrsvp_confirm']									= "Are you sure you want to remove your RSVP from this event?";
 $l['msg_unrsvp_success']									= "You have successfully removed your RSVP for this event.";
 
@@ -98,6 +101,12 @@ $l['user_controls_create']									= "Create Event";
 $l['user_controls_edit']									= "Edit Event";
 $l['user_controls_delete']									= "Delete Event";
 $l['user_controls_cancel']									= "Cancel Event";
+$l['user_controls_old']										= "View Old Events";
+
+//Notices...
+$l['notice_ended']											= "This event has ended";
+$l['notice_soon']											= "This event is going to start in less than a week";
+$l['notice_running']										= "This event is currently running";
 
 //Special
 $l['thread_message']										= "Automated thread created for the event.";

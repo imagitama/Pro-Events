@@ -39,7 +39,7 @@ if (!$isallowed) {
 
 
 //Check if they are a moderator... TODO: Check!
-#$ismoderator = proevents_is_moderator();
+$ismoderator = proevents_is_moderator();
 
 
 //Get event info...
@@ -70,10 +70,19 @@ if ($mybb->input['action'] == 'do_event_create') {
 	//If valid...
 	if (count($input['errors']) == 0) {
 		add_breadcrumb($lang->title_event_create);
+
+		$threadid = '';
 		
 		//If to post thread...
 		if (intval($input['forumid']) > 0) {
 			$threadid = proevents_post_event_to_forum($input);
+		}
+
+		//If to skip and set the thread ID...
+		if (intval($input['threadid']) > 0) {
+			if ($ismoderator) {
+				$threadid = intval($input['threadid']);
+			}
 		}
 		
 		$insert = array(
@@ -129,6 +138,10 @@ if ($mybb->input['action'] == 'do_event_edit') {
 	if ($iscreator) {
 		if ($event) {
 			add_breadcrumb($lang->title_event_edit, PAGE_URL);
+
+			if (!$ismoderator) {
+				unset($mybb->input['threadid']);
+			}
 			
 			//Call an external function to deal with validation...
 			$input = proevents_validate_event_input();
@@ -136,12 +149,13 @@ if ($mybb->input['action'] == 'do_event_edit') {
 			if ($input['name']) {
 				$db->query("
 					UPDATE `".TABLE_PREFIX."proevents` SET
+						`threadid`		= '".$db->escape_string($input['threadid'])."',
 						`name` 			= '".$db->escape_string($input['name'])."', 
 						`description` 	= '".$db->escape_string($input['description'])."', 
 						`location`		= '".$db->escape_string($input['location'])."',
 						`imageurl`		= '".$db->escape_string($input['imageurl'])."', 
 						`datestart`		= '".$db->escape_string($input['datestart'])."', 
-						`dateend`		= '".$db->escape_string($input['dateend'])."', 
+						`dateend`		= '".$db->escape_string($input['dateend'])."',
 						`allowrsvp`		= '".$db->escape_string($input['allowrsvp'])."',
 						`allowcomments`	= '".$db->escape_string($input['allowcomments'])."', 
 						`rsvplimit`		= '".$db->escape_string($input['rsvplimit'])."', 
@@ -155,8 +169,11 @@ if ($mybb->input['action'] == 'do_event_edit') {
 				//Set up form errors...
 				$form_errors = inline_error($input['errors']);
 				$mybb->input['action'] = 'edit';
-				
+
 				$event = $mybb->input;
+
+				$event['datestart'] = proevents_build_dates($event['datestart']);
+				$event['dateend'] 	= proevents_build_dates($event['dateend']);
 			}
 		} else {
 			error($lang->error_invalid_event);
@@ -246,12 +263,29 @@ if ($mybb->input['action'] == 'create') {
 		eval("\$form_error = \"".$templates->get('proevents_form_errors')."\";");
 	}
 	
-	$forumoptions = proevents_generate_dropdown('forum');
-	
-	$allowrsvp = 'checked';
-	$allowcomments = 'checked';
-	$rsvplimit = 0;
-	$postthread = 'checked';
+	$allowrsvp 		= 'checked';
+	$allowcomments 	= 'checked';
+	$rsvplimit 		= 0;
+	$threadsettings = '';
+
+	if ($mybb->settings['proevents_event_thread_forums']) {
+		$forumoptions = proevents_generate_dropdown('forum');
+		$postthread 	= 'checked';
+
+		eval("\$threadsettings .= \"".$templates->get('proevents_event_thread_settings')."\";");
+	}
+
+	$event['datestart'] = proevents_build_dates();
+	$event['dateend'] 	= proevents_build_dates();
+
+	//Thread settings...
+	if ($ismoderator) {
+		eval("\$threadsettings = \"".$templates->get('proevents_event_mod_thread_settings')."\";");
+	}
+
+	if (!$threadsettings) {
+		$threadsettings = $lang->msg_none;
+	}
 	
 	//Output templates...
 	eval("\$proevents = \"".$templates->get('proevents_event_create')."\";");
@@ -288,13 +322,14 @@ if ($mybb->input['action'] == 'edit') {
 			
 			//Select...
 			$forumoptions = proevents_generate_dropdown('forum', $forum['forumid']);
-			
-			//Dates... TODO: These dates cause it to reset to original UNIX timestamp!
-			if ($event['datestart']) {
-				//$datestart = my_date($mybb->settings['dateformat'].' '.$mybb->settings['timeformat'], $event['datestart'], $mybb->user['timezone']); //TODO: Verify 'Y-m-d H:i:s'
-			}
-			if ($event['dateend']) {
-				//$dateend = my_date($mybb->settings['dateformat'].' '.$mybb->settings['timeformat'], $event['dateend'], $mybb->user['timezone']);
+
+			//Parse dates...
+			if (is_numeric($event['datestart']) && is_numeric($event['dateend'])) {
+				$datestart 	= proevents_parse_date($event['datestart']);
+				$dateend 	= proevents_parse_date($event['dateend']);
+
+				$event['datestart'] = proevents_build_dates($datestart);
+				$event['dateend'] 	= proevents_build_dates($dateend);
 			}
 			
 			//Checkbox...
@@ -306,6 +341,17 @@ if ($mybb->input['action'] == 'edit') {
 			}
 			if ($event['approversvp']) {
 				$approversvp = 'checked';
+			}
+
+			$threadsettings = '';
+
+			//Thread settings...
+			if ($ismoderator) {
+				eval("\$threadsettings .= \"".$templates->get('proevents_event_mod_thread_settings')."\";");
+			}
+
+			if (!$threadsettings) {
+				$threadsettings = $lang->msg_none;
 			}
 
 			//Output templates...
@@ -355,7 +401,6 @@ if ($mybb->input['action'] == 'view'  && $mybb->input['eventid'] && $mybb->reque
 
 		$dateend 		= my_date($mybb->settings['dateformat'], $event['dateend'], $mybb->user['timezone']);
 		$timeend		= my_date($mybb->settings['timeformat'], $event['dateend'], $mybb->user['timezone']);
-
 
 		$when			= $datestart;
 
@@ -419,6 +464,29 @@ if ($mybb->input['action'] == 'view'  && $mybb->input['eventid'] && $mybb->reque
 			}
 		} else {
 			eval("\$rsvplist .= \"".$templates->get('proevents_event_view_rsvplist_row_none')."\";");
+		}
+
+		//Notices...
+		$notice = '';
+
+		//If event ended...
+		if (time() > $event['dateend']) {
+			eval("\$notice = \"".$templates->get('proevents_event_notice_ended')."\";");
+
+		//If event has not started...
+		} else if (time() < $event['datestart']) {
+			$cutoff = intval($mybb->settings['proevents_soon_cutoff']);
+
+			if ($cutoff > 0) {
+				//If starting in a week...
+				if (time() > strtotime('-'.$cutoff.' days', $event['dateend'])) {
+					eval("\$notice = \"".$templates->get('proevents_event_notice_soon')."\";");
+				}
+			}
+
+		//If event has not ended...
+		} else if (time() > $event['datestart'] && time() < $event['dateend']) {
+			eval("\$notice = \"".$templates->get('proevents_event_notice_running')."\";");
 		}
 		
 		//RSVP button...
@@ -489,9 +557,17 @@ if ($mybb->input['action'] == 'unrsvp') {
 }
 
 //******************************************************[ DEFAULT ]
-if ($mybb->input['action'] == '' && $mybb->request_method == 'get') {
-	//Get any unfinished or upcoming events... TODO: Split into days/weeks/months! TODO: Way to view old/outdated events!
-	$query = $db->query("SELECT * FROM `".TABLE_PREFIX."proevents` WHERE `datestart` > ".time()." AND (`dateend` > ".time()." OR `dateend` = 0) ORDER BY `datestart` ASC");
+if (($mybb->input['action'] == '' || $mybb->input['action'] == 'old') && $mybb->request_method == 'get') {
+	if ($mybb->input['action'] == 'old') {
+		$where = "(`dateend` < ".time()." OR `dateend` = 0)";
+	} else {
+		$where = "(`dateend` > ".time()." OR `dateend` = 0)";
+	}
+
+	//Get any unfinished or upcoming events... TODO: Split into days/weeks/months!
+	$query = $db->query("SELECT * FROM `".TABLE_PREFIX."proevents` WHERE ".$where." ORDER BY `datestart` ASC");
+
+	//`datestart` > ".time()." AND 
 	
 	if ($db->num_rows($query) > 0) {
 	while ($event = $db->fetch_array($query)) {
@@ -524,6 +600,7 @@ if ($mybb->input['action'] == '' && $mybb->request_method == 'get') {
 	}
 	
 	eval("\$usercontrols = \"".$templates->get('proevents_calendar_user_controls_create')."\";");
+	eval("\$usercontrols .= \"".$templates->get('proevents_calendar_user_controls_old')."\";");
 	eval("\$usercontrols = \"".$templates->get('proevents_calendar_user_controls')."\";");
 	
 	//Output templates...
