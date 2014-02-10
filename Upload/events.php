@@ -139,8 +139,9 @@ if ($mybb->input['action'] == 'do_event_edit') {
 		if ($event) {
 			add_breadcrumb($lang->title_event_edit, PAGE_URL);
 
+			//TODO: Is removing each time!
 			if (!$ismoderator) {
-				unset($mybb->input['threadid']);
+				$mybb->input['threadid'] = $event['threadid'];
 			}
 			
 			//Call an external function to deal with validation...
